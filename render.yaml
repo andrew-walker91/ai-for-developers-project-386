@@ -1,0 +1,11 @@
+# Render.com static site configuration
+services:
+  - type: web
+    name: hexlet-ai
+    env: static
+    buildCommand: make build
+    staticPublishPath: dist
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
