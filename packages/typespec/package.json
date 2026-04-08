@@ -1,0 +1,18 @@
+{
+  "name": "@hexlet-ai/typespec",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npm run compile && npm run move-output",
+    "compile": "npx tsp compile . --emit @typespec/openapi3",
+    "move-output": "node -e \"const fs=require('fs');const src='tsp-output/@typespec/openapi3/openapi.yaml';const dst='../../apps/backend/openapi.yaml';if(fs.existsSync(src)){fs.mkdirSync('../../apps/backend',{recursive:true});fs.copyFileSync(src,dst);console.log('Copied openapi.yaml to apps/backend');}\"",
+    "check": "npx tsp check ."
+  },
+  "dependencies": {
+    "@typespec/compiler": ">=1.0.0",
+    "@typespec/http": ">=1.0.0",
+    "@typespec/openapi": ">=1.0.0",
+    "@typespec/openapi3": "^1.11.0",
+    "@typespec/versioning": "^0.81.0"
+  }
+}

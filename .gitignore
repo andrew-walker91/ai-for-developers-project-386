@@ -1,20 +1,54 @@
+# Dependencies
 node_modules
-dist
-tsconfig.tsbuildinfo
+**/node_modules
 
+# Build outputs
+dist
+**/dist
+tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
+tsp-output
+
+# .NET
+bin
+obj
+*.dll
+*.exe
+*.pdb
+*.user
+*.suo
+*.DotSettings.user
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Environment
 .env
 .env.local
 .env.*.local
 
+# Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
+# IDE
 .idea
 .vscode
 *.swp
 *.swo
+*.suo
 
+# OS
 .DS_Store
 Thumbs.db
 
+# Test coverage
 coverage
+**/coverage
+
+# Docker
+docker-compose.override.yml

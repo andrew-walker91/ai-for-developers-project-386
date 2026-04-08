@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: (title)
+  description: API for appointment booking system - Cal.com clone
+  version: 0.0.0
+tags: []
+paths:
+  /api/bookings:
+    post:
+      operationId: createBooking
+      description: Create a new booking
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/Booking'
+                  - $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBooking'
+    get:
+      operationId: getBookings
+      description: Get all bookings (owner only)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+  /api/bookings/{bookingId}:
+    delete:
+      operationId: deleteBooking
+      description: Delete a booking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+  /api/event-types:
+    get:
+      operationId: getEventTypes
+      description: List of event types
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+    post:
+      operationId: createEventType
+      description: Create a new event type (owner only)
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventType'
+                  - $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventType'
+  /api/event-types/{eventTypeId}:
+    get:
+      operationId: getEventType
+      description: Get a single event type by ID
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventType'
+                  - $ref: '#/components/schemas/Error'
+  /api/slots:
+    get:
+      operationId: getSlots
+      description: Get available slots for a specific date and event type
+      parameters:
+        - name: eventTypeId
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Slot'
+                  - $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - slotId
+        - guestName
+        - guestEmail
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Unique identifier
+        eventTypeId:
+          type: string
+          description: ID of the booked event type
+        slotId:
+          type: string
+          description: ID of the booked slot
+        guestName:
+          type: string
+          description: Name of the guest
+        guestEmail:
+          type: string
+          description: Email of the guest
+        createdAt:
+          type: string
+          format: date-time
+          description: When the booking was created (UTC)
+        slot:
+          allOf:
+            - $ref: '#/components/schemas/Slot'
+          description: The booked slot details
+        eventType:
+          allOf:
+            - $ref: '#/components/schemas/EventType'
+          description: The event type details
+      description: Represents a booking made by a guest
+    CreateBooking:
+      type: object
+      required:
+        - eventTypeId
+        - slotId
+        - guestName
+        - guestEmail
+      properties:
+        eventTypeId:
+          type: string
+          description: ID of the event type to book
+        slotId:
+          type: string
+          description: ID of the slot to book
+        guestName:
+          type: string
+          description: Name of the guest
+        guestEmail:
+          type: string
+          description: Email of the guest
+      description: Input model for creating a new booking
+    CreateEventType:
+      type: object
+      required:
+        - name
+        - description
+        - durationMinutes
+      properties:
+        name:
+          type: string
+          description: Display name of the event type
+        description:
+          type: string
+          description: Detailed description of the event type
+        durationMinutes:
+          type: integer
+          format: int32
+          minimum: 5
+          description: 'Duration of the event in minutes (default: 30)'
+          default: 30
+      description: Input model for creating a new event type
+    Error:
+      type: object
+      required:
+        - status
+        - code
+        - message
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error message
+      description: Error response model with status code
+    EventType:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - durationMinutes
+      properties:
+        id:
+          type: string
+          description: Unique identifier
+        name:
+          type: string
+          description: Display name of the event type
+        description:
+          type: string
+          description: Detailed description of the event type
+        durationMinutes:
+          type: integer
+          format: int32
+          minimum: 5
+          description: Duration of the event in minutes
+      description: Represents a type of event that can be booked
+    Slot:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - startTime
+        - endTime
+        - isAvailable
+      properties:
+        id:
+          type: string
+          description: Unique identifier
+        eventTypeId:
+          type: string
+          description: ID of the event type this slot belongs to
+        startTime:
+          type: string
+          format: date-time
+          description: Start time of the slot (UTC)
+        endTime:
+          type: string
+          format: date-time
+          description: End time of the slot (UTC)
+        isAvailable:
+          type: boolean
+          description: Whether the slot is available for booking
+      description: Represents a time slot available for booking
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+    variables: {}
