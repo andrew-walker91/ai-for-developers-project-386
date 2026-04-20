@@ -8,17 +8,15 @@
 
 ## Commands
 - Install JS deps from repo root with `npm install`.
-- Frontend dev: `npm run dev:frontend`
-- Frontend checks: `npm run lint:frontend`, `npm run typecheck:frontend`, `npm run build:frontend`
-- TypeSpec checks/build: `npm run build:typespec` or, for a focused validation, `npm run check -w packages/typespec`
-- Backend dev/build: `npm run dev:backend`, `npm run build:backend`, or run `dotnet build` / `dotnet run` inside `apps/backend`
-- Backend Docker image: `npm run docker:backend`
+- Use Makefile in repo root for all commands: `make <target>`
+- Available targets: `dev-frontend`, `build-frontend`, `lint-frontend`, `typecheck-frontend`, `build-typespec`, `dev-backend`, `build-backend`, `docker-backend`
+- TypeSpec focused validation: `npm run check -w packages/typespec`
 
 ## Verification
 - There is no root `test` script and no test project in the repo today. The practical verification set is:
-  `npm run lint:frontend` -> `npm run typecheck:frontend` -> `npm run build:frontend` -> `npm run build:typespec` -> `dotnet build` in `apps/backend`.
-- `npm run build:typespec` rewrites `apps/backend/openapi.yaml` as a side effect.
-- `npm run build:frontend` writes build output to `apps/frontend/dist`.
+  `make lint-frontend` -> `make typecheck-frontend` -> `make build-frontend` -> `make build-typespec` -> `make build-backend`.
+- `make build-typespec` rewrites `apps/backend/openapi.yaml` as a side effect.
+- `make build-frontend` writes build output to `apps/frontend/dist`.
 
 ## Gotchas
 - Frontend path alias `@/*` is configured in both `apps/frontend/vite.config.ts` and `apps/frontend/tsconfig.json`; keep them in sync if aliasing changes.
