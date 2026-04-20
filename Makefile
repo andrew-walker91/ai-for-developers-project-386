@@ -1,7 +1,10 @@
-.PHONY: setup dev-frontend build-frontend build-typespec lint-frontend typecheck-frontend dev-backend build-backend docker-backend
+.PHONY: setup code-setup dev-frontend build-frontend build-typespec lint-frontend typecheck-frontend dev-backend build-backend docker-backend
 
 setup:
 	npm install
+
+code-setup:
+	@echo "Skipping code setup"
 
 dev-frontend:
 	npm run dev -w apps/frontend
