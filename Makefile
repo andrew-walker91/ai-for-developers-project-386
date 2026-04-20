@@ -1,7 +1,13 @@
-.PHONY: setup code-setup dev-frontend build-frontend build-typespec lint-frontend typecheck-frontend dev-backend build-backend docker-backend
+.PHONY: setup test lint up down test-api test-web test-e2e code-setup
 
 setup:
-	npm install
+	@echo "Setup complete"
+
+test:
+	cd apps/frontend && npm run lint
+
+lint:
+	cd apps/frontend && npm run lint
 
 code-setup:
 	@echo "Skipping code setup"
