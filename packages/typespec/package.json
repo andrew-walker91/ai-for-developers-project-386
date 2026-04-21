@@ -3,16 +3,18 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "npm run compile && npm run move-output",
+    "build": "npm run compile && npm run move-output && npm run generate-types",
     "compile": "npx tsp compile . --emit @typespec/openapi3",
     "move-output": "node -e \"const fs=require('fs');const src='tsp-output/@typespec/openapi3/openapi.yaml';const dst='../../apps/backend/openapi.yaml';if(fs.existsSync(src)){fs.mkdirSync('../../apps/backend',{recursive:true});fs.copyFileSync(src,dst);console.log('Copied openapi.yaml to apps/backend');}\"",
-    "check": "npx tsp check ."
+    "check": "npx tsp check .",
+    "generate-types": "npx openapi-typescript tsp-output/@typespec/openapi3/openapi.yaml --output ../frontend/src/api/schema.ts --enum"
   },
   "dependencies": {
-    "@typespec/compiler": ">=1.0.0",
-    "@typespec/http": ">=1.0.0",
-    "@typespec/openapi": ">=1.0.0",
-    "@typespec/openapi3": "^1.11.0",
-    "@typespec/versioning": "^0.81.0"
+    "@typespec/compiler": "1.11.0",
+    "@typespec/http": "1.11.0",
+    "@typespec/openapi": "1.11.0",
+    "@typespec/openapi3": "1.11.0",
+    "@typespec/versioning": "0.81.0",
+    "openapi-typescript": "7.13.0"
   }
 }

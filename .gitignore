@@ -29,6 +29,9 @@ obj
 .env.local
 .env.*.local
 
+# Generated API types
+apps/frontend/src/api/schema.ts
+
 # Logs
 *.log
 npm-debug.log*

@@ -5,14 +5,7 @@
     "apps/frontend",
     "packages/typespec"
   ],
-  "scripts": {
-    "dev:frontend": "npm run dev -w apps/frontend",
-    "build:frontend": "npm run build -w apps/frontend",
-    "build:typespec": "npm run build -w packages/typespec",
-    "lint:frontend": "npm run lint -w apps/frontend",
-    "typecheck:frontend": "npm run typecheck -w apps/frontend",
-    "dev:backend": "cd apps/backend && dotnet run",
-    "build:backend": "cd apps/backend && dotnet build",
-    "docker:backend": "cd apps/backend && docker build -t booking-api ."
+  "devDependencies": {
+    "concurrently": "9.2.1"
   }
 }
