@@ -4,7 +4,7 @@ install:
 	npm install
 
 dev: build-typespec
-	npx concurrently --kill-others "npx -p prism mock -p 3000 apps/backend/openapi.yaml" "cd apps/frontend && npx vite"
+	npx concurrently --kill-others "npx prism mock apps/backend/openapi.yaml" "npm run dev --prefix apps/frontend"
 
 dev-frontend:
 	cd apps/frontend && npx vite

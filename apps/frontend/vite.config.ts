@@ -5,7 +5,7 @@ import path from 'path';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
-  const proxyTarget = env.VITE_API_TARGET || 'http://localhost:3000';
+  const proxyTarget = env.VITE_API_TARGET || 'http://localhost:4010';
 
   return {
     plugins: [react()],
