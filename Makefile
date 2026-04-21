@@ -1,37 +1,43 @@
-.PHONY: setup test lint up down test-api test-web test-e2e code-setup
+.PHONY: install dev dev-frontend dev-prism dev-backend build build-frontend build-typespec build-backend lint typecheck test docker
 
-setup:
-	@echo "Setup complete"
+install:
+	npm install
 
-test:
-	cd apps/frontend && npm run lint
-
-lint:
-	cd apps/frontend && npm run lint
-
-code-setup:
-	@echo "Skipping code setup"
+dev: build-typespec
+	npx concurrently --kill-others "npx -p prism mock -p 3000 apps/backend/openapi.yaml" "cd apps/frontend && npx vite"
 
 dev-frontend:
-	npm run dev -w apps/frontend
+	cd apps/frontend && npx vite
 
-build-frontend:
-	npm run build -w apps/frontend
-
-build-typespec:
-	npm run build -w packages/typespec
-
-lint-frontend:
-	npm run lint -w apps/frontend
-
-typecheck-frontend:
-	npm run typecheck -w apps/frontend
+dev-prism:
+	cd packages/typespec && npx tsp compile . --emit @typespec/openapi3
+	node -e "const fs=require('fs');const src='packages/typespec/tsp-output/@typespec/openapi3/openapi.yaml';const dst='apps/backend/openapi.yaml';if(fs.existsSync(src)){fs.copyFileSync(src,dst);console.log('Copied openapi.yaml');}else{console.error('openapi.yaml not found');process.exit(1);}"
+	npx openapi-typescript apps/backend/openapi.yaml --output apps/frontend/src/api/schema.ts --enum
+	npx prism mock -p 3000 apps/backend/openapi.yaml
 
 dev-backend:
 	cd apps/backend && dotnet run
 
+build: build-typespec build-frontend
+
+build-frontend:
+	cd apps/frontend && npx vite build
+
+build-typespec:
+	cd packages/typespec && npx tsp compile . --emit @typespec/openapi3
+	node -e "const fs=require('fs');const src='packages/typespec/tsp-output/@typespec/openapi3/openapi.yaml';const dst='apps/backend/openapi.yaml';if(fs.existsSync(src)){fs.copyFileSync(src,dst);console.log('Copied openapi.yaml');}else{console.error('openapi.yaml not found');process.exit(1);}"
+	npx openapi-typescript apps/backend/openapi.yaml --output apps/frontend/src/api/schema.ts --enum
+
+lint:
+	cd apps/frontend && npx eslint src
+
+typecheck:
+	cd apps/frontend && npx tsc --noEmit
+
+test: lint typecheck
+
 build-backend:
 	cd apps/backend && dotnet build
 
-docker-backend:
+docker:
 	cd apps/backend && docker build -t booking-api .
