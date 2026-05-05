@@ -2,38 +2,81 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookingApi.Data;
 using BookingApi.Models;
+using BookingApi.Services;
 
 namespace BookingApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/bookings")]
 public class BookingsController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly ISlotService _slotService;
+    private readonly IConfiguration _config;
 
-    public BookingsController(AppDbContext context)
+    public BookingsController(AppDbContext context, ISlotService slotService, IConfiguration config)
     {
         _context = context;
+        _slotService = slotService;
+        _config = config;
+    }
+
+    private bool IsAdminAuthorized()
+    {
+        var header = Request.Headers["X-Admin-Secret"].FirstOrDefault();
+        return header == _config["AdminSecret"];
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Booking>>> GetAll()
     {
+        if (!IsAdminAuthorized())
+        {
+            return Unauthorized(new ErrorResponse { Status = 401, Code = "UNAUTHORIZED", Message = "Invalid or missing admin secret" });
+        }
+
         return await _context.Bookings.ToListAsync();
     }
 
     [HttpPost]
     public async Task<ActionResult<Booking>> Create([FromBody] CreateBookingRequest request)
     {
-        var slot = await _context.Slots.FindAsync(request.SlotId);
-        if (slot == null)
+        // Parse slotId as ISO datetime
+        if (!DateTime.TryParse(request.SlotId, out var slotStart))
         {
-            return NotFound(new ErrorResponse { Status = 404, Code = "SLOT_NOT_FOUND", Message = "Slot not found" });
+            return BadRequest(new ErrorResponse { Status = 400, Code = "INVALID_SLOT", Message = "Invalid slot ID format" });
         }
 
-        if (!slot.IsAvailable)
+        var eventType = await _context.EventTypes.FindAsync(request.EventTypeId);
+        if (eventType == null)
+        {
+            return NotFound(new ErrorResponse { Status = 404, Code = "EVENT_TYPE_NOT_FOUND", Message = "Event type not found" });
+        }
+
+        var slotEnd = slotStart.AddMinutes(eventType.DurationMinutes);
+
+        // Check global occupancy: any existing booking overlapping this time?
+        var isTaken = await _context.Bookings.AnyAsync(b =>
+            b.StartTime < slotEnd && b.EndTime > slotStart);
+
+        if (isTaken)
         {
             return Conflict(new ErrorResponse { Status = 409, Code = "SLOT_TAKEN", Message = "Slot is already booked" });
+        }
+
+        // Validate working hours: 09:00-18:00
+        var dayStart = slotStart.Date.AddHours(9);
+        var dayEnd = slotStart.Date.AddHours(18);
+        if (slotStart < dayStart || slotEnd > dayEnd)
+        {
+            return BadRequest(new ErrorResponse { Status = 400, Code = "OUTSIDE_WORKING_HOURS", Message = "Slot is outside working hours (09:00-18:00)" });
+        }
+
+        // Validate 14-day window
+        var maxDate = DateTime.Now.Date.AddDays(14);
+        if (slotStart.Date > maxDate)
+        {
+            return BadRequest(new ErrorResponse { Status = 400, Code = "TOO_FAR_IN_FUTURE", Message = "Booking window is 14 days from today" });
         }
 
         var booking = new Booking
@@ -43,10 +86,11 @@ public class BookingsController : ControllerBase
             SlotId = request.SlotId,
             GuestName = request.GuestName,
             GuestEmail = request.GuestEmail,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            StartTime = slotStart,
+            EndTime = slotEnd
         };
 
-        slot.IsAvailable = false;
         _context.Bookings.Add(booking);
         await _context.SaveChangesAsync();
 
@@ -56,16 +100,15 @@ public class BookingsController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
+        if (!IsAdminAuthorized())
+        {
+            return Unauthorized(new ErrorResponse { Status = 401, Code = "UNAUTHORIZED", Message = "Invalid or missing admin secret" });
+        }
+
         var booking = await _context.Bookings.FindAsync(id);
         if (booking == null)
         {
             return NotFound(new ErrorResponse { Status = 404, Code = "NOT_FOUND", Message = "Booking not found" });
-        }
-
-        var slot = await _context.Slots.FindAsync(booking.SlotId);
-        if (slot != null)
-        {
-            slot.IsAvailable = true;
         }
 
         _context.Bookings.Remove(booking);

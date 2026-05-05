@@ -6,14 +6,22 @@ using BookingApi.Models;
 namespace BookingApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/event-types")]
 public class EventTypesController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IConfiguration _config;
 
-    public EventTypesController(AppDbContext context)
+    public EventTypesController(AppDbContext context, IConfiguration config)
     {
         _context = context;
+        _config = config;
+    }
+
+    private bool IsAdminAuthorized()
+    {
+        var header = Request.Headers["X-Admin-Secret"].FirstOrDefault();
+        return header == _config["AdminSecret"];
     }
 
     [HttpGet]
@@ -36,6 +44,11 @@ public class EventTypesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<EventType>> Create([FromBody] CreateEventTypeRequest request)
     {
+        if (!IsAdminAuthorized())
+        {
+            return Unauthorized(new ErrorResponse { Status = 401, Code = "UNAUTHORIZED", Message = "Invalid or missing admin secret" });
+        }
+
         if (request.DurationMinutes < 5)
         {
             return BadRequest(new ErrorResponse { Status = 400, Code = "INVALID_DURATION", Message = "Duration must be at least 5 minutes" });
