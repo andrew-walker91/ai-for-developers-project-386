@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Text, Card, Badge, Button, Group, Stack, SimpleGrid,
@@ -9,6 +9,11 @@ import { notifications } from '@mantine/notifications';
 import { api, type EventType, type Slot } from '@/api/client';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const OWNER = { name: 'Андрейка', role: 'Владелец календаря' };
 
@@ -17,7 +22,7 @@ export function SlotsPage() {
   const navigate = useNavigate();
   const [eventType, setEventType] = useState<EventType | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState('');
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
@@ -36,7 +41,7 @@ export function SlotsPage() {
       })
       .catch((e) => {
         if (!cancelled) {
-          notifications.show({ title: 'Ошибка', message: e.message, color: 'red' });
+          notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
           setLoading(false);
         }
       });
@@ -48,10 +53,15 @@ export function SlotsPage() {
     let cancelled = false;
     api.getSlots(eventTypeId, selectedDate)
       .then((data) => {
-        if (!cancelled) setSlots(Array.isArray(data) ? data : []);
+        if (!cancelled) {
+          setSlots(Array.isArray(data) ? data : []);
+        }
       })
-      .catch(() => {
-        if (!cancelled) setSlots([]);
+      .catch((e) => {
+        if (!cancelled) {
+          notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
+          setSlots([]);
+        }
       });
     return () => { cancelled = true; };
   }, [eventTypeId, selectedDate]);
@@ -59,7 +69,7 @@ export function SlotsPage() {
   const availableSlots = useMemo(() => slots.filter((s) => s.isAvailable), [slots]);
   const unavailableSlots = useMemo(() => slots.filter((s) => !s.isAvailable), [slots]);
 
-  const handleBooking = async () => {
+  const handleBooking = useCallback(async () => {
     if (!selectedSlot || !eventTypeId) return;
     if (guestName.length < 2) {
       notifications.show({ title: 'Ошибка', message: 'Имя должно быть не менее 2 символов', color: 'red' });
@@ -74,17 +84,16 @@ export function SlotsPage() {
     try {
       await api.createBooking({ eventTypeId, slotId: selectedSlot.id, guestName, guestEmail });
       notifications.show({ title: 'Успешно', message: 'Встреча забронирована!', color: 'green' });
-      navigate('/event-types');
+      navigate('/');
     } catch (e: unknown) {
       notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [selectedSlot, eventTypeId, guestName, guestEmail, navigate]);
 
-  const formatTime = (iso: string) => dayjs(iso).locale('ru').format('HH:mm');
-
-  const formatDate = (dateStr: string) => dayjs(dateStr).locale('ru').format('DD.MM.YYYY');
+  const formatTime = (iso: string) => dayjs(iso).tz('Europe/Moscow').format('HH:mm');
+  const formatDate = (dateStr: string) => dayjs(dateStr).tz('Europe/Moscow').format('DD.MM.YYYY');
 
   if (!eventType && !loading) {
     return <Text c="dimmed">Тип события не найден</Text>;
@@ -92,7 +101,7 @@ export function SlotsPage() {
 
   return (
     <Stack gap="xl" py="xl">
-      <LoadingOverlay visible={loading && !eventType} />
+      <LoadingOverlay visible={loading} />
 
       <Group>
         <Button variant="subtle" onClick={() => navigate('/event-types')}>← Назад</Button>
@@ -127,36 +136,54 @@ export function SlotsPage() {
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text fw={600} mb="md">Выберите дату</Text>
           <Calendar
-            date={selectedDate ?? undefined}
-            onDateChange={(d) => setSelectedDate(d)}
+            date={selectedDate ? dayjs(selectedDate).toDate() : undefined}
+            onDateChange={(d: unknown) => {
+              const date = d as Date | null;
+              if (!date) {
+                setSelectedDate('');
+                return;
+              }
+              const dateStr = dayjs(date).format('YYYY-MM-DD');
+              console.log('Date selected:', dateStr);
+              setSelectedDate(dateStr);
+            }}
+            minDate={new Date()}
+            maxDate={dayjs().add(14, 'day').toDate()}
             minLevel="month"
             maxLevel="month"
           />
         </Card>
 
-        <Stack gap="md">
-          <Text fw={600}>Доступные слоты</Text>
-          {availableSlots.length === 0 && selectedDate && !loading && (
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Text fw={600} mb="md">Доступные слоты</Text>
+          {!selectedDate && (
+            <Text size="sm" c="dimmed">Выберите дату, чтобы увидеть слоты</Text>
+          )}
+          {selectedDate && availableSlots.length === 0 && (
             <Text size="sm" c="dimmed">Нет свободных слотов на эту дату</Text>
           )}
-          {availableSlots.map((slot) => (
-            <Button
-              key={slot.id}
-              variant={selectedSlot?.id === slot.id ? 'filled' : 'light'}
-              fullWidth
-              onClick={() => setSelectedSlot(slot)}
-            >
-              {formatTime(slot.startTime)} – {formatTime(slot.endTime)}
-            </Button>
-          ))}
+          <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="xs">
+            {availableSlots.map((slot) => (
+              <Button
+                key={slot.id}
+                size="xs"
+                variant={selectedSlot?.id === slot.id ? 'filled' : 'light'}
+                onClick={() => setSelectedSlot(slot)}
+              >
+                {formatTime(slot.startTime)}
+              </Button>
+            ))}
+          </SimpleGrid>
           {unavailableSlots.length > 0 && (
             <>
-              <Divider label="Занято" labelPosition="center" />
-              {unavailableSlots.map((slot) => (
-                <Button key={slot.id} variant="default" fullWidth disabled>
-                  {formatTime(slot.startTime)} – {formatTime(slot.endTime)} (занято)
-                </Button>
-              ))}
+              <Divider label="Занято" labelPosition="center" mt="md" />
+              <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="xs">
+                {unavailableSlots.map((slot) => (
+                  <Button key={slot.id} size="xs" variant="default" disabled>
+                    {formatTime(slot.startTime)} (занято)
+                  </Button>
+                ))}
+              </SimpleGrid>
             </>
           )}
 
@@ -182,7 +209,7 @@ export function SlotsPage() {
               </Button>
             </>
           )}
-        </Stack>
+        </Card>
       </SimpleGrid>
     </Stack>
   );

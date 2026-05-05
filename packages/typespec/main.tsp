@@ -74,6 +74,9 @@ namespace BookingAPI {
     @doc("When the booking was created (UTC)")
     createdAt: utcDateTime;
 
+    @doc("Start time of the booked slot (UTC)")
+    startTime: utcDateTime;
+
     @doc("The booked slot details")
     slot?: Slot;
 

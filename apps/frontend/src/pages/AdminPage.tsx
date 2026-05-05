@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Title, Text, Table, Button, Badge, Group, Stack, Card, Modal,
-  TextInput, NumberInput, Textarea, LoadingOverlay, ActionIcon,
+  TextInput, NumberInput, Textarea, LoadingOverlay,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { api, type Booking, type EventType } from '@/api/client';
@@ -64,16 +64,6 @@ export function AdminPage() {
     }
   };
 
-  const handleDeleteBooking = async (id: string) => {
-    try {
-      await api.deleteBooking(id);
-      notifications.show({ title: 'Удалено', message: 'Бронирование отменено', color: 'green' });
-      refreshData();
-    } catch (e: unknown) {
-      notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
-    }
-  };
-
   const getEventTypeName = (id: string) => eventTypes.find((et) => et.id === id)?.name ?? id;
 
   return (
@@ -95,8 +85,7 @@ export function AdminPage() {
               <Table.Th>Гость</Table.Th>
               <Table.Th>Email</Table.Th>
               <Table.Th>Тип встречи</Table.Th>
-              <Table.Th>Дата создания</Table.Th>
-              <Table.Th />
+              <Table.Th>Дата встречи</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -105,12 +94,7 @@ export function AdminPage() {
                 <Table.Td>{b.guestName}</Table.Td>
                 <Table.Td>{b.guestEmail}</Table.Td>
                 <Table.Td>{getEventTypeName(b.eventTypeId)}</Table.Td>
-                <Table.Td>{dayjs(b.createdAt).locale('ru').format('DD.MM.YYYY HH:mm')}</Table.Td>
-                <Table.Td>
-                  <ActionIcon color="red" variant="subtle" onClick={() => handleDeleteBooking(b.id)}>
-                    ✕
-                  </ActionIcon>
-                </Table.Td>
+                <Table.Td>{dayjs(b.startTime).tz('Europe/Moscow').format('DD.MM.YYYY HH:mm')}</Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>

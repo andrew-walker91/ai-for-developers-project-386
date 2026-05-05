@@ -4,7 +4,7 @@ import { Title, Text, Card, SimpleGrid, Badge, Button, Group, Stack, Avatar, Loa
 import { notifications } from '@mantine/notifications';
 import { api, type EventType } from '@/api/client';
 
-const OWNER = { name: 'Tota', role: 'Владелец календаря' };
+const OWNER = { name: 'Андрейка', role: 'Владелец календаря' };
 
 export function EventTypesPage() {
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
