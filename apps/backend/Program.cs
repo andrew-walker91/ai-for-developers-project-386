@@ -22,29 +22,47 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
 
-    if (!db.EventTypes.Any())
+    var defaultEventTypes = new[]
     {
-        db.EventTypes.Add(new EventType
+        new EventType
         {
-            Id = Guid.NewGuid(),
             Name = "Консультация",
             Description = "Персональная консультация по любым вопросам",
             DurationMinutes = 30
-        });
-        db.EventTypes.Add(new EventType
+        },
+        new EventType
         {
-            Id = Guid.NewGuid(),
             Name = "Глубокое интервью",
             Description = "Подробный разбор ситуации и планирование",
             DurationMinutes = 60
-        });
-        db.EventTypes.Add(new EventType
+        },
+        new EventType
         {
-            Id = Guid.NewGuid(),
             Name = "Стратегическая сессия",
             Description = "Долгая встреча для стратегического планирования",
             DurationMinutes = 90
+        }
+    };
+
+    foreach (var defaultEventType in defaultEventTypes)
+    {
+        var exists = db.EventTypes.Any(eventType => eventType.Name == defaultEventType.Name);
+        if (exists)
+        {
+            continue;
+        }
+
+        db.EventTypes.Add(new EventType
+        {
+            Id = Guid.NewGuid(),
+            Name = defaultEventType.Name,
+            Description = defaultEventType.Description,
+            DurationMinutes = defaultEventType.DurationMinutes
         });
+    }
+
+    if (db.ChangeTracker.HasChanges())
+    {
         db.SaveChanges();
     }
 }

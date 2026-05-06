@@ -1,7 +1,6 @@
 import type { components } from './schema';
 
 type EventType = components['schemas']['EventType'];
-type CreateEventType = components['schemas']['CreateEventType'];
 type Slot = components['schemas']['Slot'];
 type Booking = components['schemas']['Booking'];
 type CreateBooking = components['schemas']['CreateBooking'];
@@ -34,13 +33,6 @@ export const api = {
 
   getEventType: (id: string) => request<EventType>(`/api/event-types/${id}`),
 
-  createEventType: (data: CreateEventType) =>
-    request<EventType>('/api/event-types', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: adminHeaders(),
-    }),
-
   getSlots: (eventTypeId: string, date: string) =>
     request<Slot[]>(`/api/slots?eventTypeId=${eventTypeId}&date=${date}`),
 
@@ -49,11 +41,6 @@ export const api = {
 
   getBookings: () =>
     request<Booking[]>('/api/bookings', { headers: adminHeaders() }),
-
-  deleteBooking: (id: string) =>
-    fetch(`/api/bookings/${id}`, { method: 'DELETE', headers: adminHeaders() }).then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    }),
 };
 
-export type { EventType, CreateEventType, Slot, Booking, CreateBooking };
+export type { EventType, Slot, Booking, CreateBooking };

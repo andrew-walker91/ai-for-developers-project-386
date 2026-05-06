@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Title, Text, Table, Button, Badge, Group, Stack, Card, Modal,
-  TextInput, NumberInput, Textarea, LoadingOverlay,
-} from '@mantine/core';
+import { Title, Text, Table, Badge, Group, Stack, Card, LoadingOverlay } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { api, type Booking, type EventType } from '@/api/client';
 import dayjs from 'dayjs';
@@ -12,11 +9,6 @@ export function AdminPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modalOpened, setModalOpened] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newDesc, setNewDesc] = useState('');
-  const [newDuration, setNewDuration] = useState(30);
-  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,51 +27,21 @@ export function AdminPage() {
     return () => { cancelled = true; };
   }, []);
 
-  const refreshData = () => {
-    Promise.all([api.getBookings(), api.getEventTypes()])
-      .then(([b, et]) => {
-        setBookings(b);
-        setEventTypes(et);
-      })
-      .catch((e: unknown) => {
-        notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
-      });
-  };
-
-  const handleCreateEventType = async () => {
-    if (!newName.trim()) return;
-    setCreating(true);
-    try {
-      await api.createEventType({ name: newName, description: newDesc, durationMinutes: newDuration });
-      notifications.show({ title: 'Создано', message: 'Тип события создан', color: 'green' });
-      setNewName('');
-      setNewDesc('');
-      setNewDuration(30);
-      setModalOpened(false);
-      refreshData();
-    } catch (e: unknown) {
-      notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
-    } finally {
-      setCreating(false);
-    }
-  };
-
   const getEventTypeName = (id: string) => eventTypes.find((et) => et.id === id)?.name ?? id;
 
   return (
-    <Stack gap="xl" py="xl">
+    <Stack gap="xl" py={{ base: 'sm', md: 'md' }}>
       <LoadingOverlay visible={loading} />
 
-      <Group justify="space-between">
+      <Group>
         <Title order={2}>Админка</Title>
-        <Button onClick={() => setModalOpened(true)}>+ Тип события</Button>
       </Group>
 
       <Title order={3}>Предстоящие встречи</Title>
       {bookings.length === 0 && !loading ? (
         <Text c="dimmed">Нет бронирований</Text>
       ) : (
-        <Table striped highlightOnHover>
+        <Table striped highlightOnHover withTableBorder withColumnBorders={false}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Гость</Table.Th>
@@ -102,26 +64,23 @@ export function AdminPage() {
       )}
 
       <Title order={3}>Типы событий</Title>
-      <Group>
+      <Group align="stretch">
         {eventTypes.map((et) => (
-          <Card key={et.id} shadow="sm" padding="md" radius="md" withBorder>
-            <Text fw={600}>{et.name}</Text>
-            <Text size="sm" c="dimmed">{et.description}</Text>
-            <Badge color="blue" variant="light" mt="xs">{et.durationMinutes} мин</Badge>
+          <Card
+            key={et.id}
+            padding="lg"
+            maw={280}
+            style={{
+              background: 'linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%)',
+              borderColor: 'rgba(28, 42, 65, 0.08)',
+            }}
+          >
+            <Text fw={700} mb="xs">{et.name}</Text>
+            <Text size="sm" c="dimmed" lh={1.6}>{et.description}</Text>
+            <Badge color="blue" variant="light" mt="md">{et.durationMinutes} мин</Badge>
           </Card>
         ))}
       </Group>
-
-      <Modal opened={modalOpened} onClose={() => setModalOpened(false)} title="Новый тип события">
-        <Stack gap="md">
-          <TextInput label="Название" required value={newName} onChange={(e) => setNewName(e.currentTarget.value)} />
-          <Textarea label="Описание" value={newDesc} onChange={(e) => setNewDesc(e.currentTarget.value)} />
-          <NumberInput label="Длительность (мин)" min={5} value={newDuration} onChange={(v) => setNewDuration(Number(v) || 30)} />
-          <Button fullWidth loading={creating} onClick={handleCreateEventType}>
-            Создать
-          </Button>
-        </Stack>
-      </Modal>
     </Stack>
   );
 }
