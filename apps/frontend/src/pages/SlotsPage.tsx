@@ -4,16 +4,11 @@ import {
   Text, Card, Badge, Button, Group, Stack, SimpleGrid,
   TextInput, Avatar, LoadingOverlay, Divider,
 } from '@mantine/core';
-import { Calendar } from '@mantine/dates';
+import { DatePicker } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { api, type EventType, type Slot } from '@/api/client';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 const OWNER = { name: 'Андрейка', role: 'Владелец календаря' };
 
@@ -62,6 +57,9 @@ export function SlotsPage() {
           notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
           setSlots([]);
         }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
   }, [eventTypeId, selectedDate]);
@@ -92,8 +90,8 @@ export function SlotsPage() {
     }
   }, [selectedSlot, eventTypeId, guestName, guestEmail, navigate]);
 
-  const formatTime = (iso: string) => dayjs(iso).tz('Europe/Moscow').format('HH:mm');
-  const formatDate = (dateStr: string) => dayjs(dateStr).tz('Europe/Moscow').format('DD.MM.YYYY');
+  const formatTime = (iso: string) => dayjs(iso).format('HH:mm');
+  const formatDate = (dateStr: string) => dayjs(dateStr).format('DD.MM.YYYY');
 
   if (!eventType && !loading) {
     return <Text c="dimmed">Тип события не найден</Text>;
@@ -135,31 +133,29 @@ export function SlotsPage() {
 
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text fw={600} mb="md">Выберите дату</Text>
-          <Calendar
-            date={selectedDate ? dayjs(selectedDate).toDate() : undefined}
-            onDateChange={(d: unknown) => {
-              const date = d as Date | null;
-              if (!date) {
+          <DatePicker
+            value={selectedDate || null}
+            onChange={(date) => {
+              if (date === null) {
                 setSelectedDate('');
                 return;
               }
-              const dateStr = dayjs(date).format('YYYY-MM-DD');
-              console.log('Date selected:', dateStr);
-              setSelectedDate(dateStr);
+
+              setSelectedDate(date);
             }}
             minDate={new Date()}
             maxDate={dayjs().add(14, 'day').toDate()}
-            minLevel="month"
+            defaultLevel="month"
             maxLevel="month"
           />
         </Card>
 
         <Card shadow="sm" padding="lg" radius="md" withBorder>
           <Text fw={600} mb="md">Доступные слоты</Text>
-          {!selectedDate && (
+          {!selectedDate && !loading && (
             <Text size="sm" c="dimmed">Выберите дату, чтобы увидеть слоты</Text>
           )}
-          {selectedDate && availableSlots.length === 0 && (
+          {selectedDate && availableSlots.length === 0 && !loading && (
             <Text size="sm" c="dimmed">Нет свободных слотов на эту дату</Text>
           )}
           <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="xs">

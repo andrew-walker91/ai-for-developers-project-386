@@ -52,6 +52,7 @@ Thumbs.db
 # Test coverage
 coverage
 **/coverage
+.playwright-mcp
 
 # Docker
 docker-compose.override.yml

@@ -94,7 +94,7 @@ export function AdminPage() {
                 <Table.Td>{b.guestName}</Table.Td>
                 <Table.Td>{b.guestEmail}</Table.Td>
                 <Table.Td>{getEventTypeName(b.eventTypeId)}</Table.Td>
-                <Table.Td>{dayjs(b.startTime).tz('Europe/Moscow').format('DD.MM.YYYY HH:mm')}</Table.Td>
+                <Table.Td>{dayjs(b.startTime).format('DD.MM.YYYY HH:mm')}</Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>
