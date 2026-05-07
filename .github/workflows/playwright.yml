@@ -33,17 +33,15 @@ jobs:
         run: |
           cd apps/backend
           dotnet run &
-        shell: bash
-        background: true
+          echo "Waiting for backend..."
+          sleep 10
 
       - name: Start frontend
-        run: npm run dev &
-        shell: bash
-        background: true
-        working-directory: apps/frontend
-
-      - name: Wait for servers
-        run: sleep 15
+        run: |
+          cd apps/frontend
+          npm run dev &
+          echo "Waiting for frontend..."
+          sleep 15
 
       - name: Run Playwright tests
         run: npx playwright test
