@@ -56,3 +56,8 @@ coverage
 
 # Docker
 docker-compose.override.yml
+
+# Build outputs
+apps/publish
+apps/publish-output
+scripts/
