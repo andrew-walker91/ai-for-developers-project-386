@@ -19,11 +19,11 @@ jobs:
           cache: 'npm'
 
       - name: Install frontend dependencies
-        run: npm install
+        run: npm config set registry https://registry.npmjs.org && npm install
         working-directory: apps/frontend
 
       - name: Build project
-        run: make build
+        run: npm config set registry https://registry.npmjs.org && make build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
