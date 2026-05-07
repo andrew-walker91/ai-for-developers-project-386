@@ -18,6 +18,8 @@
 - `make lint` — eslint
 - `make typecheck` — tsc --noEmit
 - `make test` — lint + typecheck
+- `make test-e2e` — Playwright интеграционные тесты (headless)
+- `make test-e2e-ui` — Playwright с UI режимом
 - `make docker` — docker build для бэка
 
 ## Verification

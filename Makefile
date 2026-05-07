@@ -1,4 +1,4 @@
-.PHONY: install dev dev-frontend dev-backend build build-frontend build-typespec build-backend lint typecheck test docker
+.PHONY: install dev dev-frontend dev-backend build build-frontend build-typespec build-backend lint typecheck test test-e2e test-e2e-ui docker
 
 install:
 	npm install
@@ -29,6 +29,12 @@ typecheck:
 	cd apps/frontend && npx tsc --noEmit
 
 test: lint typecheck
+
+test-e2e:
+	cd apps/frontend && npx playwright test
+
+test-e2e-ui:
+	cd apps/frontend && npx playwright test --ui
 
 build-backend:
 	cd apps/backend && dotnet build
