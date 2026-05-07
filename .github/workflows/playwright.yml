@@ -16,14 +16,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install frontend dependencies
-        run: npm config set registry https://registry.npmjs.org && npm install
-        working-directory: apps/frontend
+        run: |
+          npm config set registry https://registry.npmjs.org
+          cd apps/frontend
+          npm install
 
       - name: Build project
-        run: npm config set registry https://registry.npmjs.org && make build
+        run: |
+          npm config set registry https://registry.npmjs.org
+          make build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
