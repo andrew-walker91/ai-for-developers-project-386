@@ -24,7 +24,7 @@ jobs:
       - name: Build and Publish
         run: |
           cd apps/backend
-          dotnet publish -c Release -o bin/Release/net8.0
+          dotnet publish -c Release -o ../../bin/Release/net8.0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -45,7 +45,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/backend:latest
 
       - name: Deploy to Render
-        if: secrets.RENDER_API_KEY != ''
+        if: ${{ secrets.RENDER_API_KEY != '' }}
         run: |
           curl -X POST "https://api.render.com/v1/services" \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
