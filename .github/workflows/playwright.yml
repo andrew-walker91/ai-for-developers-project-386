@@ -18,15 +18,10 @@ jobs:
           node-version: '20'
 
       - name: Install frontend dependencies
-        run: |
-          npm config set registry https://registry.npmjs.org
-          cd apps/frontend
-          npm install
+        run: npm install
 
-      - name: Build project
-        run: |
-          npm config set registry https://registry.npmjs.org
-          make build
+      - name: Build TypeSpec and Frontend
+        run: make build-typespec build-frontend
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -35,22 +30,16 @@ jobs:
       - name: Start backend
         run: |
           cd apps/backend
-          nohup dotnet run > backend.log 2>&1 &
-          sleep 10
-          curl -s http://localhost:5000 || (cat backend.log; exit 1)
-        shell: bash
-
-      - name: Start frontend
-        run: |
-          cd apps/frontend
-          nohup npm run dev -- --host > frontend.log 2>&1 &
+          nohup dotnet run --urls "http://+:5000" > backend.log 2>&1 &
           sleep 15
-          curl -s http://localhost:5173 || (cat frontend.log; exit 1)
+          curl -sf http://localhost:5000/health || (cat backend.log; exit 1)
         shell: bash
 
       - name: Run Playwright tests
         run: npx playwright test
         working-directory: apps/frontend
+        env:
+          VITE_API_TARGET: http://localhost:5000
 
       - uses: actions/upload-artifact@v4
         if: always()

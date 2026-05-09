@@ -1,0 +1,10 @@
+**/node_modules
+**/bin
+**/obj
+**/.git
+**/dist
+**/tsp-output
+**/.vite
+**/test-results
+**/playwright-report
+**/*.log
