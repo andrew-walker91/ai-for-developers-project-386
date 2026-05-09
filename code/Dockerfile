@@ -15,7 +15,4 @@ COPY --from=build /app/publish .
 EXPOSE ${PORT:-5000}
 ENV ASPNETCORE_URLS=http://+:${PORT:-5000}
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
-
 ENTRYPOINT ["dotnet", "BookingApi.dll"]
