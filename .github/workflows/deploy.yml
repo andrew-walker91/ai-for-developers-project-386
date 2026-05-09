@@ -1,4 +1,4 @@
-name: Deploy to Render
+name: Build and Deploy to Render
 
 on:
   push:
@@ -6,18 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Build .NET project
-        run: dotnet publish apps/backend/BookingApi.csproj -c Release -o apps/backend/bin/Release/net8.0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -32,11 +24,11 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/backend
+          context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}/backend:latest
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/backend:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/backend:buildcache,mode=max
+          tags: ghcr.io/${{ github.repository }}/hexlet-booking:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/hexlet-booking:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/hexlet-booking:buildcache,mode=max
 
       - name: Deploy to Render
         env:
@@ -48,10 +40,10 @@ jobs:
             -d '{
               "name": "hexlet-booking",
               "type": "web",
-              "image": "ghcr.io/${{ github.repository }}/backend:latest",
+              "image": "ghcr.io/${{ github.repository }}/hexlet-booking:latest",
               "env": "docker",
-              "region": "Oregon",
+              "region": "oregon",
               "envVars": [
-                {"key": "PORT", "value": "10000"}
+                {"key": "ASPNETCORE_URLS", "value": "http://+:${PORT}"}
               ]
             }'
