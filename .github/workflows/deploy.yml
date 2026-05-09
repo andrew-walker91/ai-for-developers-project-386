@@ -27,8 +27,6 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}/hexlet-booking:latest
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/hexlet-booking:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/hexlet-booking:buildcache,mode=max
 
       - name: Deploy to Render
         env:
