@@ -42,11 +42,8 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          # Install render CLI
-          npm install -g render
-
           # Create or update service
-          render deploy \
+          npx render deploy \
             --service-id=${{ secrets.RENDER_SERVICE_ID }} \
             --image=ghcr.io/${{ github.repository }}/backend:latest \
             --env=PORT=10000
