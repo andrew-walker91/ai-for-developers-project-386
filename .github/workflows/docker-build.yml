@@ -45,7 +45,6 @@ jobs:
           tags: ghcr.io/${{ github.repository }}/backend:latest
 
       - name: Deploy to Render
-        if: ${{ secrets.RENDER_API_KEY != '' }}
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
