@@ -43,7 +43,7 @@ jobs:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           # Install render CLI
-          npm install -g @render.com/cli
+          npm install -g render
 
           # Create or update service
           render deploy \
