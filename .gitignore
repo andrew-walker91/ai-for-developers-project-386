@@ -53,6 +53,7 @@ Thumbs.db
 coverage
 **/coverage
 .playwright-mcp
+.last-run*
 
 # Docker
 docker-compose.override.yml
