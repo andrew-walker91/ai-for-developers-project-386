@@ -21,7 +21,6 @@ jobs:
         run: |
           rm -rf node_modules package-lock.json
           npm install
-          npm install openapi-typescript
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
