@@ -21,7 +21,6 @@ jobs:
         run: |
           rm -rf node_modules package-lock.json
           npm install
-          npm rebuild
           npm install openapi-typescript
 
       - name: Setup .NET
@@ -39,8 +38,8 @@ jobs:
       - name: Start backend
         run: |
           cd apps/backend
-          nohup dotnet bin/Release/net8.0/linux-x64/BookingApi.dll > backend.log 2>&1 &
-          sleep 15
+          nohup dotnet run > backend.log 2>&1 &
+          sleep 30
           curl -sf http://localhost:5000/health || (cat backend.log; exit 1)
         shell: bash
 

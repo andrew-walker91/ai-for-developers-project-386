@@ -5,13 +5,13 @@ RUN dotnet restore apps/backend/BookingApi.csproj
 COPY apps/backend/ apps/backend/
 RUN dotnet publish apps/backend/BookingApi.csproj -c Release -o /src/publish
 
-FROM node:20-alpine AS frontend-build
+FROM node:20 AS frontend-build
 WORKDIR /src
 COPY package*.json ./
 COPY packages/typespec packages/typespec
 COPY apps/frontend apps/frontend
 COPY apps/backend apps/backend
-RUN npm install && npm rebuild && \
+RUN rm -rf node_modules package-lock.json && npm install && \
     cd packages/typespec && npx tsp compile . --emit @typespec/openapi3 && \
     cp tsp-output/@typespec/openapi3/openapi.yaml /src/apps/backend/openapi.yaml && \
     cd /src && npx openapi-typescript apps/backend/openapi.yaml --output apps/frontend/src/api/schema.ts --enum && \
