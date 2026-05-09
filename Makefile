@@ -1,4 +1,4 @@
-.PHONY: install dev dev-frontend dev-backend build build-frontend build-typespec build-backend lint typecheck test test-e2e test-e2e-ui docker
+.PHONY: install dev dev-frontend dev-backend build build-frontend build-typespec build-backend lint typecheck test test-e2e test-e2e-ui docker docker-build docker-run
 
 install:
 	npm install
@@ -38,4 +38,12 @@ test-e2e-ui:
 
 build-backend:
 	cd apps/backend && dotnet build
+
+docker-build:
+	docker build -t hexlet-booking .
+
+docker-run:
+	docker run -d -p 8080:8080 --env PORT=8080 hexlet-booking
+
+docker: docker-build docker-run
 
