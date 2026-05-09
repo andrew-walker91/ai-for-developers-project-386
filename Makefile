@@ -39,11 +39,3 @@ test-e2e-ui:
 build-backend:
 	cd apps/backend && dotnet build
 
-docker-build:
-	cd apps/backend && dotnet publish -c Release -o bin/Release/net8.0
-	docker build -t hexlet-booking -f apps/backend/Dockerfile .
-
-docker-run:
-	docker run -d -p 5000:5000 -e PORT=5000 hexlet-booking
-
-docker: docker-build docker-run
