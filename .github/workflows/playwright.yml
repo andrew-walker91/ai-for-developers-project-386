@@ -24,8 +24,13 @@ jobs:
           npm rebuild
           npm install openapi-typescript
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Build TypeSpec and Frontend
-        run: make build-typespec build-frontend
+        run: make build-typespec build-frontend build-backend
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -34,7 +39,7 @@ jobs:
       - name: Start backend
         run: |
           cd apps/backend
-          nohup dotnet run --urls "http://+:5000" > backend.log 2>&1 &
+          nohup dotnet bin/Release/net8.0/BookingApi.dll --urls "http://+:5000" > backend.log 2>&1 &
           sleep 15
           curl -sf http://localhost:5000/health || (cat backend.log; exit 1)
         shell: bash
