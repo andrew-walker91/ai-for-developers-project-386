@@ -20,5 +20,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build TypeSpec types
+        run: make build-typespec
+
       - name: Run tests (lint + typecheck)
         run: make test
