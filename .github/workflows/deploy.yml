@@ -42,8 +42,16 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          # Create or update service
-          npx render deploy \
-            --service-id=${{ secrets.RENDER_SERVICE_ID }} \
-            --image=ghcr.io/${{ github.repository }}/backend:latest \
-            --env=PORT=10000
+          curl -X POST "https://api.render.com/v1/services" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "hexlet-booking",
+              "type": "web",
+              "image": "ghcr.io/${{ github.repository }}/backend:latest",
+              "env": "docker",
+              "region": "Oregon",
+              "envVars": [
+                {"key": "PORT", "value": "10000"}
+              ]
+            }'
