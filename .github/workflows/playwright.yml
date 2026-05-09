@@ -39,7 +39,7 @@ jobs:
       - name: Start backend
         run: |
           cd apps/backend
-          nohup dotnet bin/Release/net8.0/BookingApi.dll > backend.log 2>&1 &
+          nohup dotnet bin/Release/net8.0/linux-x64/BookingApi.dll > backend.log 2>&1 &
           sleep 15
           curl -sf http://localhost:5000/health || (cat backend.log; exit 1)
         shell: bash
