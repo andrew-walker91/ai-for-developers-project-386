@@ -5,8 +5,8 @@ using BookingApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-builder.WebHost.UseUrls($"http://+:{port}");
+var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "http://+:5000";
+builder.WebHost.UseUrls(urls);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -22,7 +22,6 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Ensure database is created and seed default data
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

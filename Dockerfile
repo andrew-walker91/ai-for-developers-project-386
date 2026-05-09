@@ -20,8 +20,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=backend-build /src/publish /app
 COPY --from=frontend-build /src/apps/frontend/dist /app/wwwroot
-EXPOSE $PORT
-ENV ASPNETCORE_URLS=http://+:${PORT}
-ENV PORT=${PORT}
+ENV PORT=8080
+EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD curl -f http://localhost:${PORT}/health || exit 1
 ENTRYPOINT ["dotnet", "/app/BookingApi.dll"]
