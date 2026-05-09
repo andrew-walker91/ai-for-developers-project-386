@@ -22,6 +22,7 @@ WORKDIR /app
 COPY --from=backend-build /src/publish /app
 COPY --from=frontend-build /src/apps/frontend/dist /app/wwwroot
 ENV PORT=8080
-EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:${PORT}
+EXPOSE ${PORT}
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD curl -f http://localhost:${PORT}/health || exit 1
 ENTRYPOINT ["dotnet", "/app/BookingApi.dll"]
