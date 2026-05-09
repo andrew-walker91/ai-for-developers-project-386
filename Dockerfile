@@ -10,9 +10,10 @@ WORKDIR /src
 COPY package*.json ./
 COPY packages/typespec packages/typespec
 COPY apps/frontend apps/frontend
+COPY apps/backend apps/backend
 RUN npm install && \
     cd packages/typespec && npx tsp compile . --emit @typespec/openapi3 && \
-    cp tsp-output/@typespec/openapi3/openapi.yaml ../apps/backend/openapi.yaml && \
+    cp tsp-output/@typespec/openapi3/openapi.yaml /src/apps/backend/openapi.yaml && \
     cd /src && npx openapi-typescript apps/backend/openapi.yaml --output apps/frontend/src/api/schema.ts --enum && \
     cd /src/apps/frontend && npx vite build
 
