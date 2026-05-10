@@ -65,4 +65,8 @@ packages/
 
 ## CI/CD
 
-GitHub Actions runs linting, type checking, and e2e tests on every push.
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | Push/PR to `main` | Lint + typecheck |
+| `playwright.yml` | Push/PR to `main` | E2E tests via Playwright |
+| `deploy.yml` | Push to `main` | Build Docker image → push to GHCR → deploy to Railway |

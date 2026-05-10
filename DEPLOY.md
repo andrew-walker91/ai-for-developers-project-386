@@ -2,8 +2,8 @@
 
 ## Dockerfile
 
-- **Путь:** `apps/backend/Dockerfile`
-- **Использует:** переменную окружения `PORT` (по умолчанию 5000)
+- **Путь:** `Dockerfile` (в корне репозитория)
+- **Использует:** переменную окружения `PORT` (по умолчанию 8080)
 - **База:** mcr.microsoft.com/dotnet/aspnet:8.0
 
 ## Локальная сборка
@@ -12,27 +12,25 @@
 make docker
 ```
 
-## Деплой на Render
+## Деплой на Railway
 
-### Вариант 1: Автоматически через GitHub Actions
+### Автоматически через GitHub Actions
 
 1. Добавь в GitHub Secrets:
-   - `RENDER_API_KEY` - получи на https://dashboard.render.com/api-keys
-2. Запусти workflow `docker-build.yml`
+   - `RAILWAY_TOKEN` — получи на https://railway.com/account/tokens
+   - `RAILWAY_SERVICE_ID` — ID сервиса в Railway
+2. Пуш в ветку `main` запустит workflow `deploy.yml`
 
-### Вариант 2: Вручную
+### Вручную
 
-1. Зарегистрируйся на https://render.com
-2. Создай "New Web Service"
-3. Подключи GitHub репозиторий
-4. Настрой:
-   - Root Directory: `apps/backend`
-   - Build Command: (пусто)
-   - Start Command: (пусто)
-   - Environment Variables: `PORT=10000`
+1. Зарегистрируйся на https://railway.com
+2. Создай "New Project" → "Deploy from GitHub repo"
+3. Подключи репозиторий
+4. Railway автоматически определит Dockerfile и соберёт проект
+5. Добавь переменную окружения `PORT=8080` в настройках сервиса
 
 ---
 
 ## Публичная ссылка
 
-Добавь ссылку после деплоя:
+https://hexlet-calendar.up.railway.app

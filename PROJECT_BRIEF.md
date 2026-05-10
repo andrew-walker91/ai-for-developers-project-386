@@ -13,7 +13,7 @@
 - **Владелец календаря** — один заранее заданный профиль (hardcoded). Используется по умолчанию в админской части.
   - Создаёт типы событий: `id`, `name`, `description`, `durationMinutes`.
   - Смотрит страницу предстоящих встреч: единый список бронирований всех типов событий.
-  - Идентификация: `VITE_ADMIN_SECRET` в `.env`. Админка доступна по `/admin`.
+  - Идентификация: логин/пароль (admin/admin) через форму входа. Админка доступна по `/admin/login`.
 - **Гость** — без аккаунта и входа.
   - Видит список типов событий (название, описание, длительность).
   - Выбирает тип события → открывает календарь → выбирает свободный слот.
@@ -45,13 +45,13 @@
 - `/` — лендинг
 - `/event-types` — гость: список типов событий
 - `/event-types/:eventTypeId/slots` — гость: выбор даты и слота
-- `/admin` — админка владельца (требует `VITE_ADMIN_SECRET`)
+- `/admin` — админка владельца (требует логин/пароль admin/admin)
+- `/admin/login` — форма входа в админку
 
 ## 7. Конфигурация
 - **API Base URL**: `VITE_API_TARGET` в `.env`
   - Dev: `http://localhost:5000` (локальный бэк)
-  - Prod: `http://localhost:5000` (реальный бэк)
-- **Admin Secret**: `VITE_ADMIN_SECRET` в `.env`
+  - Prod: определяется через Vite proxy
 - Фронт обращается к `/api/*`, Vite proxy решает, куда направить.
 
 ## 8. Генерация типов
@@ -65,10 +65,10 @@ npm run build:typespec  # генерирует openapi.yaml + schema.ts
 Base: `/api` (проксируется на `VITE_API_TARGET`). Пути в kebab-case.
 - `GET  /event-types` — список типов.
 - `GET  /event-types/{eventTypeId}` — один тип.
-- `POST /event-types` — создать тип (требует admin secret).
+- `POST /event-types` — создать тип (требует admin auth).
 - `GET  /slots?eventTypeId&date` — доступные слоты на дату.
 - `POST /bookings` — создать бронирование.
-- `GET  /bookings` — список всех бронирований (требует admin secret).
+- `GET  /bookings` — список всех бронирований (требует admin auth).
 - `DELETE /bookings/{bookingId}` — удалить бронирование.
 
 Модели: `EventType`, `CreateEventType`, `Slot`, `Booking`, `CreateBooking`, `Error`.
@@ -84,5 +84,5 @@ Base: `/api` (проксируется на `VITE_API_TARGET`). Пути в keba
 ## 11. Валидация (фронт)
 - Guest name: мин. 2 символа
 - Guest email: стандартный email-паттерн
-- Ошибки API: пока не реализованы (нотификации Mantine)
+- Ошибки API: нотификации Mantine (showSuccess/showError с зеленой/красной обводкой)
 
