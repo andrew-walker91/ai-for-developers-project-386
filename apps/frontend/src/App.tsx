@@ -9,6 +9,7 @@ import { LandingPage } from './pages/LandingPage';
 import { EventTypesPage } from './pages/EventTypesPage';
 import { SlotsPage } from './pages/SlotsPage';
 import { AdminPage } from './pages/AdminPage';
+import { LoginPage } from './pages/LoginPage';
 
 const theme = createTheme({
   primaryColor: 'blue',
@@ -72,6 +73,7 @@ export default function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/event-types" element={<EventTypesPage />} />
             <Route path="/event-types/:eventTypeId/slots" element={<SlotsPage />} />
+            <Route path="/admin/login" element={<LoginPage />} />
             <Route path="/admin" element={<AdminPage />} />
           </Route>
         </Routes>

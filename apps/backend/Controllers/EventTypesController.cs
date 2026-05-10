@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookingApi.Data;
 using BookingApi.Models;
+using BookingApi.Services;
 
 namespace BookingApi.Controllers;
 
@@ -10,18 +11,20 @@ namespace BookingApi.Controllers;
 public class EventTypesController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly IConfiguration _config;
+    private readonly IAuthService _auth;
 
-    public EventTypesController(AppDbContext context, IConfiguration config)
+    public EventTypesController(AppDbContext context, IAuthService auth)
     {
         _context = context;
-        _config = config;
+        _auth = auth;
     }
 
     private bool IsAdminAuthorized()
     {
-        var header = Request.Headers["X-Admin-Secret"].FirstOrDefault();
-        return header == _config["AdminSecret"];
+        var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+        if (authHeader?.StartsWith("Bearer ") != true) return false;
+        var token = authHeader["Bearer ".Length..];
+        return _auth.ValidateToken(token);
     }
 
     [HttpGet]

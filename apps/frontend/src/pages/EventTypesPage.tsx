@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Title, Text, Card, SimpleGrid, Badge, Button, Group, Stack, Avatar, LoadingOverlay } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
+import { showError } from '@/api/notifications';
 import { api, type EventType } from '@/api/client';
 
 const OWNER = { name: 'Андрейка', role: 'Владелец календаря', avatar: '/avatar.jpg' };
@@ -14,7 +14,7 @@ export function EventTypesPage() {
   useEffect(() => {
     api.getEventTypes()
       .then(setEventTypes)
-      .catch((e) => notifications.show({ title: 'Ошибка', message: e.message, color: 'red' }))
+      .catch((e) => showError(e.message))
       .finally(() => setLoading(false));
   }, []);
 

@@ -6,10 +6,22 @@ type Booking = components['schemas']['Booking'];
 type CreateBooking = components['schemas']['CreateBooking'];
 type Error = components['schemas']['Error'];
 
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET;
-
 function isApiError(data: unknown): data is Error {
   return typeof data === 'object' && data !== null && 'code' in data && 'message' in data;
+}
+
+const TOKEN_KEY = 'admin_token';
+
+export function getAdminToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setAdminToken(token: string): void {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function clearAdminToken(): void {
+  localStorage.removeItem(TOKEN_KEY);
 }
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -17,6 +29,9 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     ...options,
   });
+  if (res.status === 204) {
+    return undefined as T;
+  }
   const data = await res.json();
   if (!res.ok || isApiError(data)) {
     throw new Error(isApiError(data) ? data.message : `HTTP ${res.status}`);
@@ -25,10 +40,23 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 function adminHeaders(): Record<string, string> {
-  return ADMIN_SECRET ? { 'X-Admin-Secret': ADMIN_SECRET } : {};
+  const token = getAdminToken();
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
 export const api = {
+  login: (username: string, password: string) =>
+    request<{ token: string }>('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    }),
+
+  logout: () =>
+    request<unknown>('/api/admin/logout', {
+      method: 'POST',
+      headers: adminHeaders(),
+    }),
+
   getEventTypes: () => request<EventType[]>('/api/event-types'),
 
   getEventType: (id: string) => request<EventType>(`/api/event-types/${id}`),
@@ -41,6 +69,9 @@ export const api = {
 
   getBookings: () =>
     request<Booking[]>('/api/bookings', { headers: adminHeaders() }),
+
+  deleteBooking: (id: string) =>
+    request<unknown>(`/api/bookings/${id}`, { method: 'DELETE', headers: adminHeaders() }),
 };
 
 export type { EventType, Slot, Booking, CreateBooking };

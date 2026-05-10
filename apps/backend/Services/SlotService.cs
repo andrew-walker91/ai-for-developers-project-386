@@ -69,6 +69,22 @@ public class SlotService : ISlotService
             current = slotEnd;
         }
 
+        // Mark 2-4 random available slots as busy to simulate occupancy
+        var rng = new Random(date.Year * 10000 + date.Month * 100 + date.Day);
+        var availableIndices = Enumerable.Range(0, slots.Count)
+            .Where(i => slots[i].IsAvailable)
+            .ToList();
+
+        if (availableIndices.Count > 0)
+        {
+            var busyCount = Math.Min(rng.Next(2, 5), availableIndices.Count);
+            var busyIndices = availableIndices.OrderBy(_ => rng.Next()).Take(busyCount).ToHashSet();
+            foreach (var idx in busyIndices)
+            {
+                slots[idx].IsAvailable = false;
+            }
+        }
+
         return slots;
     }
 }

@@ -12,19 +12,21 @@ public class BookingsController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly ISlotService _slotService;
-    private readonly IConfiguration _config;
+    private readonly IAuthService _auth;
 
-    public BookingsController(AppDbContext context, ISlotService slotService, IConfiguration config)
+    public BookingsController(AppDbContext context, ISlotService slotService, IAuthService auth)
     {
         _context = context;
         _slotService = slotService;
-        _config = config;
+        _auth = auth;
     }
 
     private bool IsAdminAuthorized()
     {
-        var header = Request.Headers["X-Admin-Secret"].FirstOrDefault();
-        return header == _config["AdminSecret"];
+        var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+        if (authHeader?.StartsWith("Bearer ") != true) return false;
+        var token = authHeader["Bearer ".Length..];
+        return _auth.ValidateToken(token);
     }
 
     [HttpGet]

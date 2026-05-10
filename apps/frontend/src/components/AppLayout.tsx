@@ -1,7 +1,16 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { AppShell, Group, Anchor, Button, Container } from '@mantine/core';
+import { getAdminToken, clearAdminToken } from '@/api/client';
 
 export function AppLayout() {
+  const navigate = useNavigate();
+  const token = getAdminToken();
+
+  const handleLogout = () => {
+    clearAdminToken();
+    navigate('/');
+  };
+
   return (
     <AppShell header={{ height: 60 }} padding="md">
       <AppShell.Header
@@ -26,9 +35,20 @@ export function AppLayout() {
               >
                 Записаться
               </Button>
-              <Button variant="filled" component={Link} to="/admin">
-                Админка
-              </Button>
+              {token ? (
+                <>
+                  <Button variant="filled" component={Link} to="/admin">
+                    Админка
+                  </Button>
+                  <Button variant="outline" color="red" onClick={handleLogout}>
+                    Выйти
+                  </Button>
+                </>
+              ) : (
+                <Button variant="filled" component={Link} to="/admin/login">
+                  Админка
+                </Button>
+              )}
             </Group>
           </Group>
         </Container>

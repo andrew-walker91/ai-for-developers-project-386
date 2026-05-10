@@ -16,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=bookings.db"));
 
 builder.Services.AddScoped<ISlotService, SlotService>();
+builder.Services.AddSingleton<IAuthService, SimpleTokenAuthService>();
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("database");

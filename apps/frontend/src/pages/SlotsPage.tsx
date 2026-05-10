@@ -5,7 +5,7 @@ import {
   TextInput, Avatar, LoadingOverlay, Divider, Paper, ThemeIcon, Tooltip,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
-import { notifications } from '@mantine/notifications';
+import { showSuccess, showError } from '@/api/notifications';
 import { api, type EventType, type Slot } from '@/api/client';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
@@ -18,7 +18,7 @@ export function SlotsPage() {
   const navigate = useNavigate();
   const [eventType, setEventType] = useState<EventType | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
@@ -56,7 +56,7 @@ export function SlotsPage() {
       })
       .catch((e) => {
         if (!cancelled) {
-          notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
+          showError((e as Error).message);
           setLoading(false);
         }
       });
@@ -66,7 +66,7 @@ export function SlotsPage() {
   useEffect(() => {
     if (!eventTypeId || !selectedDate) return;
     let cancelled = false;
-    api.getSlots(eventTypeId, selectedDate)
+    api.getSlots(eventTypeId, dayjs(selectedDate).format('YYYY-MM-DD'))
       .then((data) => {
         if (!cancelled) {
           setSlots(Array.isArray(data) ? data : []);
@@ -74,7 +74,7 @@ export function SlotsPage() {
       })
       .catch((e) => {
         if (!cancelled) {
-          notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
+          showError((e as Error).message);
           setSlots([]);
         }
       })
@@ -108,19 +108,18 @@ export function SlotsPage() {
         guestName: trimmedGuestName,
         guestEmail: trimmedGuestEmail,
       });
-      notifications.show({ title: 'Успешно', message: 'Встреча забронирована!', color: 'green' });
+      showSuccess('Встреча забронирована!');
       navigate('/');
     } catch (e: unknown) {
-      notifications.show({ title: 'Ошибка', message: (e as Error).message, color: 'red' });
+      showError((e as Error).message);
     } finally {
       setSubmitting(false);
     }
   }, [selectedSlot, eventTypeId, navigate, trimmedGuestEmail, trimmedGuestName]);
 
   const formatTime = (iso: string) => dayjs(iso).format('HH:mm');
-  const formatDate = (dateStr: string) => dayjs(dateStr).format('DD.MM.YYYY');
-  const formatWeekday = (dateStr: string) => {
-    const weekday = dayjs(dateStr).locale('ru').format('dddd');
+  const formatWeekday = (date: string) => {
+    const weekday = dayjs(date).locale('ru').format('dddd');
     return weekday.charAt(0).toUpperCase() + weekday.slice(1);
   };
 
@@ -129,7 +128,7 @@ export function SlotsPage() {
   }
 
   return (
-    <Stack gap="lg" py={{ base: 0, md: 'xs' }}>
+    <Stack gap="md" py={0}>
       <LoadingOverlay visible={loading} />
 
       <Group mb={0}>
@@ -166,30 +165,32 @@ export function SlotsPage() {
           </Stack>
         </Grid.Col>
 
-        <Grid.Col span={{ base: 12, md: 4 }}>
+        <Grid.Col span={{ base: 12, md: 3 }}>
           <Card padding="lg" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
             <Text fw={700} mb="md">Выберите дату</Text>
             <DatePicker
-              value={selectedDate || null}
+              value={selectedDate}
               onChange={(date) => {
-                if (date === null) {
-                  setSelectedDate('');
-                  setSelectedSlot(null);
-                  return;
-                }
-
                 setSelectedDate(date);
                 setSelectedSlot(null);
+              }}
+              excludeDate={(date: string) => {
+                const d = dayjs(date).day();
+                return d === 0 || d === 6;
               }}
               minDate={new Date()}
               maxDate={dayjs().add(14, 'day').toDate()}
               defaultLevel="month"
               maxLevel="month"
+              fullWidth
             />
+            <Text size="xs" c="dimmed" mt="sm" ta="center">
+              Запись доступна на ближайшие 14 дней
+            </Text>
           </Card>
         </Grid.Col>
 
-        <Grid.Col span={{ base: 12, md: 5 }}>
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <Card padding="lg" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%)' }}>
             <Text fw={700} mb="md">Доступные слоты</Text>
             {!selectedDate && !loading && (
@@ -233,18 +234,19 @@ export function SlotsPage() {
                 <Paper
                   p="lg"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(18, 94, 179, 0.09) 0%, rgba(28, 126, 214, 0.14) 100%)',
-                    border: '1px solid rgba(18, 94, 179, 0.16)',
+                    background: 'linear-gradient(135deg, rgba(18, 94, 179, 0.06) 0%, rgba(28, 126, 214, 0.10) 100%)',
+                    border: '1px solid rgba(18, 94, 179, 0.12)',
                   }}
                 >
-                  <Group align="flex-start" wrap="nowrap">
-                    <ThemeIcon size={42} radius="xl" variant="filled" color="blue">✓</ThemeIcon>
-                    <Stack gap={4}>
-                      <Text fw={800} fz="lg">Вы выбрали слот</Text>
+                  <Group align="flex-start" wrap="nowrap" gap="sm">
+                    <ThemeIcon size={36} radius="xl" variant="light" color="blue">✓</ThemeIcon>
+                    <Stack gap={2}>
+                      <Text fw={600} fz="md">Вы выбрали слот</Text>
                       <Text size="sm" c="dimmed">Проверьте дату и время перед подтверждением.</Text>
-                      <Text size="sm" fw={600} c="blue.7">{formatWeekday(selectedDate)}</Text>
-                      <Text fw={800} fz="1.45rem">{formatDate(selectedDate)}</Text>
-                      <Text fz="lg" fw={600}>{formatTime(selectedSlot.startTime)} – {formatTime(selectedSlot.endTime)}</Text>
+                      <Text mt="sm" size="sm" c="gray.7">
+                        {selectedDate ? `${formatWeekday(selectedDate)}, ${dayjs(selectedDate).locale('ru').format('D MMMM YYYY')}` : ''}
+                      </Text>
+                      <Text fw={700} fz="xl">{formatTime(selectedSlot.startTime)} — {formatTime(selectedSlot.endTime)}</Text>
                     </Stack>
                   </Group>
                 </Paper>
@@ -254,7 +256,7 @@ export function SlotsPage() {
                 <Stack gap="md">
                   <TextInput
                     label="Имя и фамилия"
-                    placeholder="Например, Анна Петрова"
+                    placeholder="например, Даша Поздина"
                     value={guestName}
                     onChange={(e) => setGuestName(e.currentTarget.value)}
                     onBlur={() => setNameTouched(true)}

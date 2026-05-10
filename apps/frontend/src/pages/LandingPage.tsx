@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Title, Text, Button, Stack, SimpleGrid, Card, Paper, Badge, Box } from '@mantine/core';
 import { Link } from 'react-router-dom';
-import { notifications } from '@mantine/notifications';
+import { showError } from '@/api/notifications';
 import { api, type EventType } from '@/api/client';
 
 export function LandingPage() {
@@ -10,7 +10,7 @@ export function LandingPage() {
   useEffect(() => {
     api.getEventTypes()
       .then(setEventTypes)
-      .catch((e: Error) => notifications.show({ title: 'Ошибка', message: e.message, color: 'red' }));
+      .catch((e: Error) => showError(e.message));
   }, []);
 
   return (
