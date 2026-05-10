@@ -1,64 +1,68 @@
 # 📅 Hexlet Calendar
 
-Сервис для записи на встречи. Выбираешь тип встречи, смотришь свободные слоты, бронируешь. Всё как у людей, только без бесконечных переписок в мессенджерах.
+A booking/calendar service where users can browse available meeting types, pick a date within a 14-day window, and book a free slot. Built as a Hexlet educational project.
 
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/andrew-walker91/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/andrew-walker91/ai-for-developers-project-386/actions)
 
 ## 🌐 Live Demo
 
-Приложение живёт на Railway и доступно по ссылке:
+Deployed on Railway:
 
 👉 **[https://hexlet-calendar.up.railway.app](https://hexlet-calendar.up.railway.app)**
 
-> Railway на бесплатном плане любит вздремнуть от бездействия. Если видите «синее окно смерти» — просто подождите 20–30 секунд, пока контейнер проснётся.
+> Note: Railway's free plan spins down the service after inactivity. The first request after a pause may take up to 30 seconds while the container cold-starts.
 
-## 🧱 Stack
+## Screenshots
 
-| Что | Чем |
+| Landing Page | Event Types | Slots & Booking |
+|---|---|---|
+| ![Landing](screenshots/screenshot-landing.png) | ![Event Types](screenshots/screenshot-events.png) | ![Slots](screenshots/screenshot-slots.png) |
+
+## Tech Stack
+
+| Layer | Technology |
 |---|---|
-| **Frontend** | React 19 + Mantine + Vite (TypeScript) |
-| **Backend** | .NET 8 (C#) |
-| **Database** | SQLite (не спрашивайте) |
+| **Frontend** | React 19, Mantine, Vite, TypeScript |
+| **Backend** | .NET 8, C# |
+| **Database** | SQLite (via EF Core) |
 | **API Contract** | TypeSpec → OpenAPI |
-| **Container** | Multi-stage Dockerfile (фронт + бэк в одном образе) |
-| **Deploy** | Railway |
+| **Container** | Multi-stage Dockerfile |
+| **Deployment** | Railway |
 
-## 🐳 Docker
+## Docker
+
+Build and run the production image:
 
 ```bash
 docker build -t hexlet-calendar .
 docker run -p 8080:8080 hexlet-calendar
 ```
 
-Открой [http://localhost:8080](http://localhost:8080). Если приложение не загрузилось — проверь, не забыл ли ты запустить сам Docker. Бывает.
+Open [http://localhost:8080](http://localhost:8080). The application serves both the frontend SPA and the API on the same port.
 
-## 🛠 Локальная разработка
+## Local Development
 
 ```bash
-make install        # npm install
-make dev-backend    # терминал 1: .NET бэкенд на :5000
-make dev-frontend   # терминал 2: Vite dev server на :5173
-make test           # линтер + тайпчек
-make test-e2e       # Playwright e2e (бэкенд должен быть запущен)
+make install          # Install npm dependencies
+make dev-backend      # Terminal 1: .NET backend on :5000
+make dev-frontend     # Terminal 2: Vite dev server on :5173
+make test             # Lint + typecheck
+make test-e2e         # Playwright e2e tests (backend must be running)
 ```
 
-Детали по архитектуре и командам — в [`AGENTS.md`](AGENTS.md).
+See [`AGENTS.md`](AGENTS.md) for detailed architecture, project layout, and workflow commands.
 
-## 🏗 Структура проекта
+## Project Structure
 
 ```
 apps/
 ├── frontend/     # React SPA (Mantine + Vite)
-├── backend/      # .NET 8 Web API
+├── backend/       # .NET 8 Web API
 packages/
-└── typespec/     # API контракт
+└── typespec/     # API contract (TypeSpec)
 ```
 
-## 🧪 CI
+## CI/CD
 
-GitHub Actions проверяет качество кода и запускает e2e тесты.
-
----
-
-Сделано с любовью и лёгкой паникой в рамках учебного проекта Hexlet.
+GitHub Actions runs linting, type checking, and e2e tests on every push.
