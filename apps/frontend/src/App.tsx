@@ -63,7 +63,7 @@ const theme = createTheme({
   },
 });
 
-export default function App() {
+const App = () => {
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">
       <Notifications position="top-right" />
@@ -80,4 +80,6 @@ export default function App() {
       </BrowserRouter>
     </MantineProvider>
   );
-}
+};
+
+export default App;

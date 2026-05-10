@@ -6,7 +6,7 @@ import { api, type EventType } from '@/api/client';
 
 const OWNER = { name: 'Андрейка', role: 'Владелец календаря', avatar: '/avatar.jpg' };
 
-export function EventTypesPage() {
+export const EventTypesPage = () => {
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

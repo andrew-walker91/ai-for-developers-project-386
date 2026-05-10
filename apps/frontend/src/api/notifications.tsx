@@ -12,7 +12,7 @@ const crossIcon = (
   </svg>
 );
 
-export function showSuccess(message: string) {
+export const showSuccess = (message: string) => {
   notifications.show({
     title: 'Успешно',
     message,
@@ -23,7 +23,7 @@ export function showSuccess(message: string) {
   });
 }
 
-export function showError(message: string) {
+export const showError = (message: string) => {
   notifications.show({
     title: 'Ошибка',
     message,

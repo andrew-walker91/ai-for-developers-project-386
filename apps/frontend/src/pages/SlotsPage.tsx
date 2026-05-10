@@ -13,7 +13,7 @@ import 'dayjs/locale/ru';
 const OWNER = { name: 'Андрейка', role: 'Владелец календаря', avatar: '/avatar.jpg' };
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function SlotsPage() {
+export const SlotsPage = () => {
   const { eventTypeId } = useParams<{ eventTypeId: string }>();
   const navigate = useNavigate();
   const [eventType, setEventType] = useState<EventType | null>(null);

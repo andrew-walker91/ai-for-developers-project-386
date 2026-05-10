@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { showError } from '@/api/notifications';
 import { api, type EventType } from '@/api/client';
 
-export function LandingPage() {
+export const LandingPage = () => {
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);
 
   useEffect(() => {

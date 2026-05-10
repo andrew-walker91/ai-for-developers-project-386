@@ -4,7 +4,7 @@ import { Title, TextInput, PasswordInput, Button, Stack, Card, Center } from '@m
 import { showError } from '@/api/notifications';
 import { api, setAdminToken } from '@/api/client';
 
-export function LoginPage() {
+export const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);

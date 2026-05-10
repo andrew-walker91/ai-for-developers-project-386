@@ -6,7 +6,7 @@ import { api, getAdminToken, type Booking, type EventType } from '@/api/client';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 
-export function AdminPage() {
+export const AdminPage = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [eventTypes, setEventTypes] = useState<EventType[]>([]);

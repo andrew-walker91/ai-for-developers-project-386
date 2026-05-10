@@ -2,7 +2,7 @@ import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { AppShell, Group, Anchor, Button, Container } from '@mantine/core';
 import { getAdminToken, clearAdminToken } from '@/api/client';
 
-export function AppLayout() {
+export const AppLayout = () => {
   const navigate = useNavigate();
   const token = getAdminToken();
 
