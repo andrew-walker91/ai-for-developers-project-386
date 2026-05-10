@@ -41,28 +41,33 @@ export function EventTypesPage() {
         {eventTypes.map((et) => (
           <Card
             key={et.id}
-            padding="xl"
+            padding="lg"
+            h="100%"
             style={{
               background: '#ffffff',
               borderColor: 'rgba(28, 42, 65, 0.08)',
             }}
           >
-<Group justify="space-between" mb="xs">
-               <Text fw={700} fz="lg">{et.name}</Text>
-               <Badge
-                  color="blue"
-                  variant="filled"
-                  px="sm"
-                  py={12}
-                  styles={{ root: { fontSize: 13, fontWeight: 800, textAlign: 'center', minWidth: 48 } }}
-               >
-                  {et.durationMinutes} мин
-               </Badge>
-             </Group>
-            <Text size="sm" c="dimmed" mb="xl">{et.description}</Text>
-            <Button fullWidth variant="filled" onClick={() => navigate(`/event-types/${et.id}/slots`)}>
-              Выбрать время
-            </Button>
+            <Stack h="100%" justify="space-between">
+              <div>
+                <Group justify="space-between" wrap="nowrap" gap="xs" mb="xs">
+                  <Text fw={700} fz="lg" style={{ flex: 1, minWidth: 0 }}>{et.name}</Text>
+                  <Badge
+                    color="blue"
+                    variant="filled"
+                    px="sm"
+                    py={12}
+                    styles={{ root: { fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' } }}
+                  >
+                    {et.durationMinutes} мин
+                  </Badge>
+                </Group>
+                <Text size="sm" c="dimmed">{et.description}</Text>
+              </div>
+              <Button fullWidth variant="filled" onClick={() => navigate(`/event-types/${et.id}/slots`)}>
+                Выбрать время
+              </Button>
+            </Stack>
           </Card>
         ))}
       </SimpleGrid>

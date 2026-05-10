@@ -152,12 +152,12 @@ export function SlotsPage() {
               <Card padding="lg" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
                 <Text fw={700} fz="lg" mb="xs">{eventType.name}</Text>
                 <Text size="sm" c="dimmed" mb="md" lh={1.6}>{eventType.description}</Text>
-<Badge
+                <Badge
                     color="blue"
                     variant="filled"
                     px="sm"
                     py={12}
-                    styles={{ root: { fontSize: 13, fontWeight: 800, textAlign: 'center', minWidth: 48 } }}
+                    styles={{ root: { fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' } }}
                   >
                     {eventType.durationMinutes} мин
                   </Badge>

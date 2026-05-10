@@ -73,25 +73,30 @@ export function LandingPage() {
         {eventTypes.map((eventType) => (
           <Card
             key={eventType.id}
-            padding="xl"
+            padding="lg"
+            h="100%"
             style={{
               background: '#ffffff',
               borderColor: 'rgba(28, 42, 65, 0.08)',
               textAlign: 'center',
             }}
           >
-            <Badge
-              color="blue"
-              variant="filled"
-              mb="lg"
-              px="md"
-              py={14}
-              styles={{ root: { fontSize: 14, fontWeight: 800 } }}
-            >
-              {eventType.durationMinutes} минут
-            </Badge>
-            <Text fw={800} fz="1.45rem" mb="sm">{eventType.name}</Text>
-            <Text size="md" c="dimmed" lh={1.6}>{eventType.description}</Text>
+            <Stack h="100%" justify="space-between" align="center">
+              <div>
+                <Badge
+                  color="blue"
+                  variant="filled"
+                  mb="lg"
+                  px="sm"
+                  py={12}
+                  styles={{ root: { fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' } }}
+                >
+                  {eventType.durationMinutes} мин
+                </Badge>
+                <Text fw={700} fz="lg" mb="sm">{eventType.name}</Text>
+                <Text size="sm" c="dimmed" lh={1.6}>{eventType.description}</Text>
+              </div>
+            </Stack>
           </Card>
         ))}
       </SimpleGrid>

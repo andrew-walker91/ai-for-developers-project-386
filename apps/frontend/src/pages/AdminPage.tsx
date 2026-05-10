@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Title, Text, Table, Badge, Group, Stack, Card, LoadingOverlay } from '@mantine/core';
+import { Title, Text, Table, Badge, Group, Stack, Card, SimpleGrid, LoadingOverlay } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { api, type Booking, type EventType } from '@/api/client';
 import dayjs from 'dayjs';
@@ -64,23 +64,37 @@ export function AdminPage() {
       )}
 
       <Title order={3}>Типы событий</Title>
-      <Group align="stretch">
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
         {eventTypes.map((et) => (
           <Card
             key={et.id}
             padding="lg"
-            maw={280}
+            h="100%"
             style={{
-              background: 'linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%)',
+              background: '#ffffff',
               borderColor: 'rgba(28, 42, 65, 0.08)',
             }}
           >
-            <Text fw={700} mb="xs">{et.name}</Text>
-            <Text size="sm" c="dimmed" lh={1.6}>{et.description}</Text>
-            <Badge color="blue" variant="light" mt="md">{et.durationMinutes} мин</Badge>
+            <Stack h="100%" justify="space-between">
+              <div>
+                <Group justify="space-between" wrap="nowrap" gap="xs" mb="xs">
+                  <Text fw={700} fz="lg" style={{ flex: 1, minWidth: 0 }}>{et.name}</Text>
+                  <Badge
+                    color="blue"
+                    variant="filled"
+                    px="sm"
+                    py={12}
+                    styles={{ root: { fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' } }}
+                  >
+                    {et.durationMinutes} мин
+                  </Badge>
+                </Group>
+                <Text size="sm" c="dimmed" lh={1.6}>{et.description}</Text>
+              </div>
+            </Stack>
           </Card>
         ))}
-      </Group>
+      </SimpleGrid>
     </Stack>
   );
 }

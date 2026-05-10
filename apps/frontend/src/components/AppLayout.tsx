@@ -14,7 +14,7 @@ export function AppLayout() {
         <Container size="lg" h="100%">
           <Group h="100%" justify="space-between">
             <Anchor component={Link} to="/" fz="xl" fw={800} underline="never" c="dark.8">
-              Calendar
+              Hexlet Calendar
             </Anchor>
             <Group gap="sm">
               <Button
