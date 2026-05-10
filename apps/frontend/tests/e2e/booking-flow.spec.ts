@@ -32,14 +32,21 @@ test.describe('Booking Flow', () => {
       // 4. Wait for slots page
       await expect(page).toHaveURL(/\/event-types\/.+\/slots/);
 
-      // 5. Select date (first available)
-      await page.waitForSelector('.mantine-DatePicker-root', { state: 'visible', timeout: 15000 });
-      await page.locator('.mantine-DatePicker-root button:not([disabled])').first().click();
+      // 5. Select a date with available slots
+      await page.locator('table').first().waitFor({ state: 'visible', timeout: 15000 });
+      const dateButtons = page.locator('table button:not([disabled])');
+      const dateCount = await dateButtons.count();
 
-      // 6. Wait for slots to load and select first available
-      await page.waitForTimeout(3000);
-      const slotButton = page.locator('button:has-text(":")').first();
-      await slotButton.click();
+      for (let d = 0; d < dateCount; d++) {
+        await dateButtons.nth(d).click();
+        await page.waitForTimeout(2000);
+
+        const noSlots = page.getByText('Нет свободных слотов на эту дату');
+        if (!(await noSlots.isVisible().catch(() => false))) break;
+      }
+
+      // 6. Select first available slot
+      await page.locator('button:not([disabled]):has-text(":")').first().click();
 
       // 7. Fill booking form
       await page.getByLabel('Имя и фамилия').fill(TEST_GUEST_NAME);
