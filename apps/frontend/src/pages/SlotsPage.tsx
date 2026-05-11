@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Text, Card, Badge, Button, Group, Stack, SimpleGrid, Grid,
   TextInput, Avatar, LoadingOverlay, Divider, Paper, ThemeIcon, Tooltip,
+  useMantineColorScheme,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { showSuccess, showError } from '@/api/notifications';
@@ -16,6 +17,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const SlotsPage = () => {
   const { eventTypeId } = useParams<{ eventTypeId: string }>();
   const navigate = useNavigate();
+  const { colorScheme } = useMantineColorScheme();
   const [eventType, setEventType] = useState<EventType | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -86,6 +88,12 @@ export const SlotsPage = () => {
 
   const availableSlots = useMemo(() => slots.filter((s) => s.isAvailable), [slots]);
   const unavailableSlots = useMemo(() => slots.filter((s) => !s.isAvailable), [slots]);
+  const cardBg = useMemo(() => colorScheme === 'dark'
+    ? 'linear-gradient(180deg, rgba(26,27,30,0.98) 0%, rgba(22,23,26,0.98) 100%)'
+    : 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)', [colorScheme]);
+  const selectedSlotBg = useMemo(() => colorScheme === 'dark'
+    ? 'linear-gradient(135deg, rgba(18, 94, 179, 0.15) 0%, rgba(28, 126, 214, 0.22) 100%)'
+    : 'linear-gradient(135deg, rgba(18, 94, 179, 0.06) 0%, rgba(28, 126, 214, 0.10) 100%)', [colorScheme]);
 
   const handleBooking = useCallback(async () => {
     if (!selectedSlot || !eventTypeId) return;
@@ -138,7 +146,7 @@ export const SlotsPage = () => {
       <Grid align="flex-start" gap="lg">
         <Grid.Col span={{ base: 12, md: 3 }}>
           <Stack gap="md">
-            <Card padding="lg" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
+            <Card padding="lg" style={{ background: cardBg }}>
               <Group>
                 <Avatar size={44} radius="xl" src={OWNER.avatar} />
                 <Stack gap={0}>
@@ -148,7 +156,7 @@ export const SlotsPage = () => {
               </Group>
             </Card>
             {eventType && (
-              <Card padding="lg" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
+              <Card padding="lg" style={{ background: cardBg }}>
                 <Text fw={700} fz="lg" mb="xs">{eventType.name}</Text>
                 <Text size="sm" c="dimmed" mb="md" lh={1.6}>{eventType.description}</Text>
                 <Badge
@@ -166,7 +174,7 @@ export const SlotsPage = () => {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 3 }}>
-          <Card padding="lg" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)' }}>
+          <Card padding="lg" style={{ background: cardBg }}>
             <Text fw={700} mb="md">Выберите дату</Text>
             <DatePicker
               value={selectedDate}
@@ -191,7 +199,7 @@ export const SlotsPage = () => {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card padding="lg" style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%)' }}>
+          <Card padding="lg" style={{ background: cardBg }}>
             <Text fw={700} mb="md">Доступные слоты</Text>
             {!selectedDate && !loading && (
               <Text size="sm" c="dimmed">Выберите дату, чтобы увидеть слоты</Text>
@@ -234,8 +242,8 @@ export const SlotsPage = () => {
                 <Paper
                   p="lg"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(18, 94, 179, 0.06) 0%, rgba(28, 126, 214, 0.10) 100%)',
-                    border: '1px solid rgba(18, 94, 179, 0.12)',
+                    background: selectedSlotBg,
+                    border: colorScheme === 'dark' ? '1px solid rgba(18, 94, 179, 0.3)' : '1px solid rgba(18, 94, 179, 0.12)',
                   }}
                 >
                   <Group align="flex-start" wrap="nowrap" gap="sm">

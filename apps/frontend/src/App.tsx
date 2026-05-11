@@ -65,7 +65,7 @@ const theme = createTheme({
 
 const App = () => {
   return (
-    <MantineProvider theme={theme} defaultColorScheme="light">
+    <MantineProvider theme={theme} defaultColorScheme="auto">
       <Notifications position="top-right" />
       <BrowserRouter>
         <Routes>

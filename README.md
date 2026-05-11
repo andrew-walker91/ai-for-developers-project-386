@@ -13,6 +13,8 @@ Deployed on Railway:
 
 > Note: Railway's free plan spins down the service after inactivity. The first request after a pause may take up to 30 seconds while the container cold-starts.
 
+> Dark mode: click the 🌙/☀️ icon in the header to toggle. The app also respects your system color scheme preference.
+
 ## Screenshots
 
 | Landing Page | Event Types | Slots & Booking |
@@ -23,7 +25,7 @@ Deployed on Railway:
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React 19, Mantine, Vite, TypeScript |
+| **Frontend** | React 19, Mantine (dark mode support), Vite, TypeScript |
 | **Backend** | .NET 8, C# |
 | **Database** | SQLite (via EF Core) |
 | **API Contract** | TypeSpec → OpenAPI |

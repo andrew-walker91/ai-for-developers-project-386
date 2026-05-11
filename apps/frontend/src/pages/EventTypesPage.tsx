@@ -44,7 +44,6 @@ export const EventTypesPage = () => {
             padding="lg"
             h="100%"
             style={{
-              background: '#ffffff',
               borderColor: 'rgba(28, 42, 65, 0.08)',
             }}
           >
