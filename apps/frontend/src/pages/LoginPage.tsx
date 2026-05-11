@@ -26,7 +26,7 @@ export const LoginPage = () => {
 
   return (
     <Center mih="60vh">
-      <Card padding="xl" w={400} withBorder shadow="sm">
+      <Card padding="xl" w="100%" maw={400} withBorder shadow="sm">
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
             <Title order={3} ta="center">Вход в админку</Title>

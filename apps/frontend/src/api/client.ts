@@ -26,11 +26,17 @@ export function clearAdminToken(): void {
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
+    method: options?.method,
+    body: options?.body,
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    ...options,
   });
   if (res.status === 204) {
     return undefined as T;
+  }
+  if (res.status === 401) {
+    clearAdminToken();
+    window.location.href = '/admin/login';
+    throw new Error('Сессия истекла, войдите заново');
   }
   const data = await res.json();
   if (!res.ok || isApiError(data)) {

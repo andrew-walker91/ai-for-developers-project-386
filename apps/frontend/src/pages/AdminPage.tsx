@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Title, Text, Table, Button, Group, Stack, LoadingOverlay, Modal } from '@mantine/core';
+import { Title, Text, Table, Button, Group, Stack, LoadingOverlay, Modal, ScrollArea } from '@mantine/core';
 import { showSuccess, showError } from '@/api/notifications';
 import { api, getAdminToken, type Booking, type EventType } from '@/api/client';
 import dayjs from 'dayjs';
@@ -88,6 +88,7 @@ export const AdminPage = () => {
       {bookings.length === 0 && !loading ? (
         <Text c="dimmed">Нет бронирований</Text>
       ) : (
+        <ScrollArea>
         <Table striped highlightOnHover withTableBorder withColumnBorders={false}>
           <Table.Thead>
             <Table.Tr>
@@ -119,6 +120,7 @@ export const AdminPage = () => {
             ))}
           </Table.Tbody>
         </Table>
+        </ScrollArea>
       )}
     </Stack>
   );
