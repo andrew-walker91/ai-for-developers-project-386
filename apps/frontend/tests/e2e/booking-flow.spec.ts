@@ -5,34 +5,34 @@ const TEST_GUEST_EMAIL = 'test@example.com';
 
 test.describe('Booking Flow', () => {
   test('should complete full booking flow for each meeting type', async ({ page }) => {
-    // 1. Visit landing page
+    // 1. Открыть лендинг
     await page.goto('/');
     await expect(page.getByText('Запишитесь на встречу')).toBeVisible();
 
-    // Get all meeting type cards from landing page
+    // Получить все карточки типов встреч
     const cards = page.locator('.mantine-SimpleGrid-root .mantine-Card-root');
     const cardCount = await cards.count();
 
-    // Iterate through each meeting type
+    // Пройти по каждому типу встречи
     for (let i = 0; i < cardCount; i++) {
-      // Reload page for each iteration to start fresh
+      // Перезагрузить страницу для чистой итерации
       await page.goto('/');
 
       const card = cards.nth(i);
       const eventName = await card.locator('.mantine-Text-root').first().textContent();
 
-      // 2. Click "Записаться" -> go to event types
+      // 2. Клик "Записаться" → переход к event-types
       await page.getByRole('link', { name: 'Записаться', exact: true }).first().click();
       await expect(page).toHaveURL('/event-types');
 
-      // 3. Select the meeting type
+      // 3. Выбрать тип встречи
       const eventCard = page.locator('.mantine-Card-root').filter({ hasText: eventName! });
       await eventCard.getByRole('button', { name: 'Выбрать время' }).click();
 
-      // 4. Wait for slots page
+      // 4. Дождаться страницы слотов
       await expect(page).toHaveURL(/\/event-types\/.+\/slots/);
 
-      // 5. Select a date with available slots
+      // 5. Выбрать дату со свободными слотами
       await page.locator('table').first().waitFor({ state: 'visible', timeout: 15000 });
       const dateButtons = page.locator('table button:not([disabled])');
       const dateCount = await dateButtons.count();
@@ -45,17 +45,17 @@ test.describe('Booking Flow', () => {
         if (!(await noSlots.isVisible().catch(() => false))) break;
       }
 
-      // 6. Select first available slot
+      // 6. Выбрать первый свободный слот
       await page.locator('button:not([disabled]):has-text(":")').first().click();
 
-      // 7. Fill booking form
+      // 7. Заполнить форму бронирования
       await page.getByLabel('Имя и фамилия').fill(TEST_GUEST_NAME);
       await page.getByLabel('Email').fill(TEST_GUEST_EMAIL);
 
-      // 8. Submit booking
+      // 8. Отправить бронирование
       await page.getByRole('button', { name: 'Подтвердить запись' }).click();
 
-      // 9. Verify success notification
+      // 9. Проверить уведомление об успехе
       await expect(page.getByText('Встреча забронирована!')).toBeVisible({ timeout: 10000 });
     }
   });
